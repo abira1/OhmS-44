@@ -51,13 +51,14 @@ const DownloadPage: React.FC = () => {
       title: 'Android APK',
       description: 'Direct download for Android devices',
       icon: <Smartphone className="h-8 w-8" />,
-      downloadUrl: '/downloads/ohms-android.apk',
-      available: false, // Will be true when APK is built
+      downloadUrl: 'https://github.com/abira1/ohms-releases/releases/download/v1.0/OhmS-44.apk',
+      available: true, // Set to true once APK is uploaded to releases
       instructions: [
-        'Download the APK file',
-        'Enable "Install from unknown sources" in Settings',
+        'Download the APK file from GitHub releases',
+        'Enable "Install from unknown sources" in Android Settings → Security',
         'Open the downloaded APK file',
-        'Follow installation prompts'
+        'Follow installation prompts',
+        'Grant necessary permissions for full functionality'
       ]
     },
     {

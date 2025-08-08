@@ -1,18 +1,37 @@
-import React from 'react';
-import { Download, Smartphone, ArrowLeftIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Download, Smartphone, ArrowLeftIcon, ExternalLink } from 'lucide-react';
 import { RetroButton } from '../components/ui/RetroButton';
+import { releaseManager, ReleaseInfo } from '../utils/releaseManager';
 
 export const DownloadPage: React.FC = () => {
+  const [releaseInfo, setReleaseInfo] = useState<ReleaseInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleDownloadAPK = () => {
-    // Replace with your actual GitHub release URL
-    const githubReleaseUrl = 'https://github.com/yourusername/ohms-releases/releases/download/v1.0/OhmS-44.apk';
+  useEffect(() => {
+    const loadReleaseInfo = async () => {
+      try {
+        const info = await releaseManager.getLatestRelease();
+        setReleaseInfo(info);
+      } catch (error) {
+        console.error('Failed to load release info:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // For now, show instructions to set up GitHub releases
-    const message = `To enable direct APK download:\n\n1. Create a GitHub repository (e.g., 'ohms-releases')\n2. Create a new release (tag: v1.0)\n3. Upload OhmS-44.apk as release asset\n4. Replace the URL in the code\n\nWould you like to see the setup instructions?`;
+    loadReleaseInfo();
+  }, []);
 
-    if (confirm(message)) {
-      window.open('https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository', '_blank');
+  const handleDownloadAPK = async () => {
+    try {
+      await releaseManager.downloadAPK('page');
+    } catch (error) {
+      // Fallback to releases page
+      const message = `APK download will be available soon!\n\nTo set up the APK download:\n\n1. Build the APK using: npm run mobile:android\n2. Create a release on GitHub: https://github.com/abira1/ohms-releases/releases/new\n3. Upload the APK file as a release asset\n\nWould you like to see the releases page?`;
+
+      if (confirm(message)) {
+        window.open('https://github.com/abira1/ohms-releases/releases', '_blank');
+      }
     }
   };
 
@@ -50,18 +69,46 @@ export const DownloadPage: React.FC = () => {
           <div className="mb-6">
             <Smartphone className="h-16 w-16 text-white mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-white mb-2">OhmS Android APK</h2>
-            <p className="text-white/70 mb-4">Version 1.0 • 2.85 MB • Ready to Install</p>
+            {isLoading ? (
+              <p className="text-white/70 mb-4">Loading release info...</p>
+            ) : releaseInfo ? (
+              <p className="text-white/70 mb-4">
+                Version {releaseInfo.version} • {releaseInfo.fileSize} • {releaseInfo.isAvailable ? 'Ready to Install' : 'Coming Soon'}
+              </p>
+            ) : (
+              <p className="text-white/70 mb-4">Version 1.0 • ~3.5 MB • Coming Soon</p>
+            )}
           </div>
 
           <div className="mb-6 space-y-3">
             <RetroButton
               onClick={handleDownloadAPK}
-              className="bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-4 w-full"
+              className={`text-white text-lg px-8 py-4 w-full flex items-center justify-center gap-2 ${
+                releaseInfo?.isAvailable
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+              disabled={isLoading}
             >
-              📱 Download APK
+              {isLoading ? (
+                <>⏳ Loading...</>
+              ) : releaseInfo?.isAvailable ? (
+                <>
+                  <Download className="h-5 w-5" />
+                  Download APK
+                </>
+              ) : (
+                <>
+                  <ExternalLink className="h-5 w-5" />
+                  View Releases
+                </>
+              )}
             </RetroButton>
             <p className="text-white/60 text-sm">
-              Click above to get download instructions or contact developer
+              {releaseInfo?.isAvailable
+                ? 'Direct download from GitHub releases'
+                : 'APK will be available soon - click to see setup instructions'
+              }
             </p>
           </div>
 
