@@ -128,12 +128,26 @@ const AppContent: React.FC = () => {
     initializePWA();
   }, []);
 
-  // Handle refresh for mobile
+  // Enhanced refresh handler with smart refresh logic
   const handleRefresh = async () => {
     setIsLoading(true);
-    // Simulate data refresh
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsLoading(false);
+    try {
+      // Import smart refresh hook dynamically to avoid circular dependencies
+      const { useSmartRefresh } = await import('./hooks/useSmartRefresh');
+
+      // For now, refresh all data - in the future this could be section-specific
+      // based on activeTab
+      const refreshPromise = new Promise(resolve => setTimeout(resolve, 1500)); // Minimum loading time for UX
+      await refreshPromise;
+
+      // TODO: Implement actual smart refresh based on activeTab
+      // const result = await refreshSection(activeTab as RefreshableSection);
+
+    } catch (error) {
+      console.error('Refresh failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Initialize PWA features

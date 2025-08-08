@@ -607,9 +607,73 @@
       50% { transform: translateX(10px); opacity: 1; }
     }
 
-    /* Pull to refresh styles */
+    /* Enhanced Pull to refresh styles */
     .pull-to-refresh {
-      transition: transform 0.3s ease-out;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pull-to-refresh-indicator {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: center;
+    }
+
+    .pull-to-refresh-active {
+      animation: pull-to-refresh-bounce 0.6s ease-out;
+    }
+
+    @keyframes pull-to-refresh-bounce {
+      0% { transform: scale(0.8) translateY(-20px); opacity: 0; }
+      50% { transform: scale(1.1) translateY(0); opacity: 1; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .pull-to-refresh-success {
+      animation: pull-to-refresh-success 0.8s ease-out;
+    }
+
+    @keyframes pull-to-refresh-success {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.2); }
+      50% { transform: scale(0.9); }
+      75% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .pull-to-refresh-ripple {
+      animation: pull-to-refresh-ripple 1s ease-out infinite;
+    }
+
+    @keyframes pull-to-refresh-ripple {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+
+    /* Retro CRT scanlines for pull-to-refresh */
+    .pull-to-refresh-scanlines {
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 1px,
+        rgba(255, 255, 255, 0.1) 1px,
+        rgba(255, 255, 255, 0.1) 2px
+      );
+      animation: scanlines-scroll 2s linear infinite;
+    }
+
+    @keyframes scanlines-scroll {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 4px; }
+    }
+
+    /* Smooth content transitions during refresh */
+    .refresh-content-blur {
+      filter: blur(0.5px);
+      transition: filter 0.3s ease-out;
+    }
+
+    .refresh-content-normal {
+      filter: blur(0);
+      transition: filter 0.3s ease-out;
     }
 
     /* Mobile card hover effects */

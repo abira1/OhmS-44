@@ -1,4 +1,28 @@
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
+
+// Performance utility: throttle function for smooth animations
+const throttle = <T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): ((...args: Parameters<T>) => void) => {
+  let timeoutId: NodeJS.Timeout | null = null;
+  let lastExecTime = 0;
+
+  return (...args: Parameters<T>) => {
+    const currentTime = Date.now();
+
+    if (currentTime - lastExecTime > delay) {
+      func(...args);
+      lastExecTime = currentTime;
+    } else {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func(...args);
+        lastExecTime = Date.now();
+      }, delay - (currentTime - lastExecTime));
+    }
+  };
+};
 
 interface TouchGestureOptions {
   onSwipeLeft?: () => void;
@@ -148,58 +172,222 @@ export const useSwipeNavigation = (
   return { bindTouchEvents, goToNextTab, goToPrevTab };
 };
 
-// Hook for pull-to-refresh functionality
-export const usePullToRefresh = (onRefresh: () => void | Promise<void>) => {
+// Enhanced pull-to-refresh functionality with visual feedback and haptic support
+export interface PullToRefreshState {
+  isPulling: boolean;
+  pullDistance: number;
+  isRefreshing: boolean;
+  canRefresh: boolean;
+  refreshTriggered: boolean;
+}
+
+export interface PullToRefreshOptions {
+  threshold?: number;
+  maxPullDistance?: number;
+  resistance?: number;
+  onStateChange?: (state: PullToRefreshState) => void;
+  onHapticFeedback?: (type: 'light' | 'medium' | 'heavy') => void;
+  disabled?: boolean;
+}
+
+export const usePullToRefresh = (
+  onRefresh: () => void | Promise<void>,
+  options: PullToRefreshOptions = {}
+) => {
+  const {
+    threshold = 80,
+    maxPullDistance = 150,
+    resistance = 0.5,
+    onStateChange,
+    onHapticFeedback,
+    disabled = false
+  } = options;
+
+  // Touch tracking refs
   const startY = useRef<number>(0);
   const currentY = useRef<number>(0);
+  const lastY = useRef<number>(0);
+  const startTime = useRef<number>(0);
   const isRefreshing = useRef<boolean>(false);
+  const hasTriggeredHaptic = useRef<boolean>(false);
+  const animationFrame = useRef<number | null>(null);
+
+  // State management with performance optimization
+  const [state, setState] = useState<PullToRefreshState>({
+    isPulling: false,
+    pullDistance: 0,
+    isRefreshing: false,
+    canRefresh: false,
+    refreshTriggered: false
+  });
+
+  // Throttle state updates for better performance
+  const throttledUpdateState = useCallback(
+    throttle((newState: Partial<PullToRefreshState>) => {
+      setState(prevState => {
+        const updatedState = { ...prevState, ...newState };
+        onStateChange?.(updatedState);
+        return updatedState;
+      });
+    }, 16), // ~60fps
+    [onStateChange]
+  );
+
+  // Utility functions
+  const isAtTop = useCallback(() => {
+    return window.scrollY <= 5; // Small tolerance for scroll position
+  }, []);
+
+  const calculatePullDistance = useCallback((currentY: number, startY: number) => {
+    const rawDistance = currentY - startY;
+    if (rawDistance <= 0) return 0;
+
+    // Apply resistance curve for more natural feel
+    const resistanceDistance = rawDistance * resistance;
+    return Math.min(resistanceDistance, maxPullDistance);
+  }, [resistance, maxPullDistance]);
+
+  // Immediate state updates for critical changes
+  const updateState = useCallback((newState: Partial<PullToRefreshState>) => {
+    setState(prevState => {
+      const updatedState = { ...prevState, ...newState };
+      onStateChange?.(updatedState);
+      return updatedState;
+    });
+  }, [onStateChange]);
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
-    startY.current = e.touches[0].clientY;
-  }, []);
+    if (disabled || !isAtTop()) return;
+
+    const touch = e.touches[0];
+    startY.current = touch.clientY;
+    currentY.current = touch.clientY;
+    lastY.current = touch.clientY;
+    startTime.current = Date.now();
+    hasTriggeredHaptic.current = false;
+
+    updateState({
+      isPulling: false,
+      pullDistance: 0,
+      canRefresh: false,
+      refreshTriggered: false
+    });
+  }, [disabled, isAtTop, updateState]);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
-    currentY.current = e.touches[0].clientY;
-    const pullDistance = currentY.current - startY.current;
+    if (disabled || isRefreshing.current) return;
 
-    // Only trigger if at top of page and pulling down
-    if (window.scrollY === 0 && pullDistance > 0) {
-      // Add visual feedback here if needed
-      if (pullDistance > 100 && !isRefreshing.current) {
-        // Show refresh indicator
+    const touch = e.touches[0];
+    currentY.current = touch.clientY;
+
+    // Only process if we're at the top and pulling down
+    if (!isAtTop() || currentY.current <= startY.current) {
+      if (state.isPulling) {
+        updateState({
+          isPulling: false,
+          pullDistance: 0,
+          canRefresh: false
+        });
       }
+      return;
     }
-  }, []);
+
+    const pullDistance = calculatePullDistance(currentY.current, startY.current);
+    const canRefresh = pullDistance >= threshold;
+    const isPulling = pullDistance > 0;
+
+    // Trigger haptic feedback when threshold is reached
+    if (canRefresh && !hasTriggeredHaptic.current) {
+      onHapticFeedback?.('medium');
+      hasTriggeredHaptic.current = true;
+    }
+
+    // Prevent default scrolling when pulling
+    if (isPulling) {
+      e.preventDefault();
+    }
+
+    // Use throttled updates for smooth pull animations
+    throttledUpdateState({
+      isPulling,
+      pullDistance,
+      canRefresh,
+      refreshTriggered: false
+    });
+
+    lastY.current = currentY.current;
+  }, [disabled, isAtTop, calculatePullDistance, threshold, state.isPulling, updateState, onHapticFeedback]);
 
   const handleTouchEnd = useCallback(async () => {
-    const pullDistance = currentY.current - startY.current;
+    if (disabled || isRefreshing.current) return;
 
-    if (window.scrollY === 0 && pullDistance > 100 && !isRefreshing.current) {
+    const pullDistance = calculatePullDistance(currentY.current, startY.current);
+    const shouldRefresh = pullDistance >= threshold && isAtTop();
+
+    if (shouldRefresh) {
       isRefreshing.current = true;
+      onHapticFeedback?.('heavy');
+
+      updateState({
+        isPulling: false,
+        isRefreshing: true,
+        refreshTriggered: true,
+        canRefresh: false
+      });
+
       try {
         await onRefresh();
+      } catch (error) {
+        console.error('Pull-to-refresh error:', error);
       } finally {
         isRefreshing.current = false;
+        updateState({
+          isRefreshing: false,
+          pullDistance: 0,
+          refreshTriggered: false
+        });
       }
+    } else {
+      // Reset state if refresh wasn't triggered
+      updateState({
+        isPulling: false,
+        pullDistance: 0,
+        canRefresh: false,
+        refreshTriggered: false
+      });
     }
 
+    // Reset tracking values
     startY.current = 0;
     currentY.current = 0;
-  }, [onRefresh]);
+    lastY.current = 0;
+    hasTriggeredHaptic.current = false;
+  }, [disabled, calculatePullDistance, threshold, isAtTop, onRefresh, onHapticFeedback, updateState]);
 
   const bindPullToRefresh = useCallback((element: HTMLElement | null) => {
-    if (!element) return;
+    if (!element || disabled) return;
 
+    // Use passive: false for touchmove to allow preventDefault
     element.addEventListener('touchstart', handleTouchStart, { passive: true });
-    element.addEventListener('touchmove', handleTouchMove, { passive: true });
+    element.addEventListener('touchmove', handleTouchMove, { passive: false });
     element.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       element.removeEventListener('touchstart', handleTouchStart);
       element.removeEventListener('touchmove', handleTouchMove);
       element.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
 
-  return { bindPullToRefresh };
+      if (animationFrame.current) {
+        cancelAnimationFrame(animationFrame.current);
+      }
+    };
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd, disabled]);
+
+  return {
+    bindPullToRefresh,
+    state,
+    isRefreshing: state.isRefreshing,
+    pullDistance: state.pullDistance,
+    canRefresh: state.canRefresh
+  };
 };
