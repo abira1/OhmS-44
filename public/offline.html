@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OhmS-44 - Offline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #FFFCF2 0%, #F5F5DC 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 
+                20px 20px 40px rgba(0, 0, 0, 0.1),
+                -20px -20px 40px rgba(255, 255, 255, 0.8);
+            border: 2px solid #9D4EDD;
+            position: relative;
+        }
+
+        .retro-scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(157, 78, 221, 0.1) 2px,
+                rgba(157, 78, 221, 0.1) 4px
+            );
+            pointer-events: none;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #9D4EDD;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(157, 78, 221, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(157, 78, 221, 0.3); }
+            to { text-shadow: 2px 2px 20px rgba(157, 78, 221, 0.6); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .offline-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .message {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #555;
+        }
+
+        .retry-btn {
+            background: linear-gradient(45deg, #9D4EDD, #FF3E6D);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
+        }
+
+        .retry-btn:active {
+            transform: translateY(0);
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .features {
+            margin-top: 2rem;
+            text-align: left;
+            background: rgba(157, 78, 221, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .features h3 {
+            color: #9D4EDD;
+            margin-bottom: 0.5rem;
+        }
+
+        .features ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .features li {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .features li::before {
+            content: "⚡";
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="retro-scanlines"></div>
+        
+        <div class="logo">OhmS-44</div>
+        <div class="subtitle">Where Energy Meets Excellence</div>
+        
+        <div class="offline-icon">📴</div>
+        
+        <div class="message">
+            <strong>You're currently offline!</strong><br>
+            Don't worry - OhmS-44 works offline too. You can still access cached content and your data will sync when you're back online.
+        </div>
+        
+        <button class="retry-btn" onclick="window.location.reload()">
+            🔄 Try Again
+        </button>
+        
+        <div class="features">
+            <h3>🚀 Available Offline:</h3>
+            <ul>
+                <li>View cached routine schedules</li>
+                <li>Browse classmates directory</li>
+                <li>Check attendance records</li>
+                <li>Read saved notices</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Auto-retry when connection is restored
+        window.addEventListener('online', () => {
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        });
+
+        // Show connection status
+        function updateConnectionStatus() {
+            if (navigator.onLine) {
+                document.querySelector('.retry-btn').textContent = '🌐 Back Online - Reload';
+                document.querySelector('.retry-btn').style.background = 'linear-gradient(45deg, #38B000, #00F5D4)';
+            }
+        }
+
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    
+    "userProfiles": {
+      "$uid": {
+        ".write": "auth != null && (auth.uid == $uid || auth.token.email == 'ohms1384@gmail.com')"
+      }
+    },
+    
+    "notices": {
+      ".write": "auth != null && auth.token.email == 'ohms1384@gmail.com'",
+      "$noticeId": {
+        "interactions": {
+          "likes": {
+            "$userId": {
+              ".write": "auth != null && auth.uid == $userId"
+            }
+          },
+          "comments": {
+            "$commentId": {
+              ".write": "auth != null && (auth.uid == newData.child('userId').val() || auth.uid == data.child('userId').val() || auth.token.email == 'ohms1384@gmail.com')"
+            }
+          }
+        },
+        "likeCount": {
+          ".write": "auth != null"
+        },
+        "commentCount": {
+          ".write": "auth != null"
+        }
+      }
+    },
+    
+    "notes": {
+      ".write": "auth != null && auth.token.email == 'ohms1384@gmail.com'"
+    },
+    
+    "students": {
+      ".write": "auth != null && auth.token.email == 'ohms1384@gmail.com'"
+    },
+    
+    "classes": {
+      ".write": "auth != null && auth.token.email == 'ohms1384@gmail.com'"
+    },
+    
+    "attendance": {
+      ".write": "auth != null && auth.token.email == 'ohms1384@gmail.com'"
+    },
+    
+    "classCancellations": {
+      ".write": "auth != null && auth.token.email == 'ohms1384@gmail.com'"
+    },
+    
+    "userApprovals": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid == $uid || auth.token.email == 'ohms1384@gmail.com')",
+        ".write": "auth != null && (auth.uid == $uid || auth.token.email == 'ohms1384@gmail.com')"
+      }
+    }
+  }
+}

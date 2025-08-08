@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PWA Icon Generator</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #FFFCF2; padding: 20px; }
+        canvas { border: 2px solid #9D4EDD; margin: 10px; }
+        .icon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🎨 OhmS-44 PWA Icon Generator</h1>
+    <p>Generating retro-style PWA icons...</p>
+    
+    <div class="icon-grid" id="iconGrid"></div>
+    
+    <script>
+        const sizes = [192, 512];
+        const colors = {
+            background: '#9D4EDD',
+            accent: '#FF3E6D',
+            text: '#FFFCF2'
+        };
+
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Background
+            ctx.fillStyle = colors.background;
+            ctx.fillRect(0, 0, size, size);
+
+            // Retro border
+            ctx.strokeStyle = colors.accent;
+            ctx.lineWidth = size * 0.02;
+            ctx.strokeRect(size * 0.1, size * 0.1, size * 0.8, size * 0.8);
+
+            // Text
+            ctx.fillStyle = colors.text;
+            ctx.font = `bold ${size * 0.15}px 'Courier New', monospace`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Main text
+            ctx.fillText('OhmS', size * 0.5, size * 0.4);
+            ctx.font = `bold ${size * 0.1}px 'Courier New', monospace`;
+            ctx.fillText('44', size * 0.5, size * 0.6);
+
+            // Retro effects
+            ctx.strokeStyle = colors.accent;
+            ctx.lineWidth = size * 0.005;
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, size * 0.2 * i);
+                ctx.lineTo(size, size * 0.2 * i);
+                ctx.stroke();
+            }
+
+            return canvas;
+        }
+
+        function downloadCanvas(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // Generate icons
+        sizes.forEach(size => {
+            const canvas = generateIcon(size);
+            const container = document.createElement('div');
+            container.innerHTML = `
+                <h3>Icon ${size}x${size}</h3>
+                <button onclick="downloadCanvas(this.nextElementSibling, 'pwa-${size}x${size}.png')">
+                    Download pwa-${size}x${size}.png
+                </button>
+            `;
+            container.appendChild(canvas);
+            document.getElementById('iconGrid').appendChild(container);
+        });
+
+        // Make downloadCanvas available globally
+        window.downloadCanvas = downloadCanvas;
+    </script>
+</body>
+</html>

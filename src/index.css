@@ -1,0 +1,904 @@
+/* PLEASE NOTE: THESE TAILWIND IMPORTS SHOULD NEVER BE DELETED */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+/* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
+/* Google Fonts for Retro Typography */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+/* Global transitions for theme switching */
+:root {
+  --transition-duration: 0.4s;
+  --retro-shadow: 4px 4px 0px rgba(0,0,0,0.8);
+  --retro-shadow-sm: 2px 2px 0px rgba(0,0,0,0.8);
+  --retro-border: 3px solid #000;
+  --retro-border-sm: 2px solid #000;
+  --retro-bg-light: #FFFCF2;
+  --retro-bg-dark: #0B090A;
+  --retro-grid-size: 20px;
+}
+/* Hide scrollbars but keep scrolling functionality */
+/* For Webkit browsers (Chrome, Safari, newer Edge) */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+/* For Firefox */
+* {
+  scrollbar-width: none;
+}
+/* For IE and Edge */
+* {
+  -ms-overflow-style: none;
+}
+* {
+  transition: background-color var(--transition-duration) ease-in-out,
+              border-color var(--transition-duration) ease-in-out,
+              color var(--transition-duration) ease-in-out,
+              box-shadow var(--transition-duration) ease-in-out;
+}
+@layer base {
+  html {
+    /* Ensure proper mobile rendering */
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-retro-cream text-gray-800 dark:bg-retro-black dark:text-retro-cream;
+    background-size: var(--retro-grid-size) var(--retro-grid-size);
+    /* Ensure body takes full height on mobile */
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    /* Prevent horizontal scrolling on mobile */
+    overflow-x: hidden;
+  }
+
+  /* Fix for mobile viewport height issues */
+  #root {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  body.light-mode {
+    @apply bg-retro-cream;
+    background-image: linear-gradient(to right, rgba(157,78,221,0.1) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(157,78,221,0.1) 1px, transparent 1px);
+  }
+  body.dark-mode {
+    @apply bg-retro-black;
+    background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+  }
+  h1, h2, h3 {
+    @apply font-vhs;
+  }
+  .retro-heading {
+    @apply font-retro text-retro-purple dark:text-retro-teal tracking-wider;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+  }
+}
+@layer components {
+  /* Retro neumorphic styles */
+  .neu-shadow {
+    box-shadow: var(--retro-shadow);
+    @apply border-2 border-black dark:border-gray-600;
+  }
+  .neu-shadow-sm {
+    box-shadow: var(--retro-shadow-sm);
+    @apply border-2 border-black dark:border-gray-600;
+  }
+  .neu-shadow-inner {
+    box-shadow: inset var(--retro-shadow-sm);
+    @apply border-2 border-black dark:border-gray-600;
+  }
+  .neu-button {
+    @apply rounded-xl bg-white dark:bg-gray-800 transition-all duration-200 transform;
+    box-shadow: 6px 6px 12px rgba(0,0,0,0.15), -6px -6px 12px rgba(255,255,255,0.9);
+  }
+
+  /* Dark mode retro styling */
+  .dark .neu-button {
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.8);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* Mobile navigation button overrides - remove all borders and shadows */
+  .mobile-nav-button {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .dark .mobile-nav-button {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Remove hover and active effects for mobile nav buttons */
+  .mobile-nav-button:hover {
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .mobile-nav-button:active {
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .dark .mobile-nav-button:hover {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .dark .mobile-nav-button:active {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Remove focus styles for mobile nav buttons */
+  .mobile-nav-button:focus {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  .mobile-nav-button:focus-visible {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+  .neu-button:hover {
+    @apply transform scale-[1.02];
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.1), inset -3px -3px 6px rgba(255,255,255,0.8);
+  }
+  .neu-button:active {
+    @apply transform scale-[0.98];
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.15), inset -4px -4px 8px rgba(255,255,255,0.7);
+  }
+
+  /* Dark mode retro hover/active states */
+  .dark .neu-button:hover {
+    @apply shadow-lg transform scale-[1.02];
+    box-shadow: 5px 5px 0px rgba(0,0,0,0.8);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .dark .neu-button:active {
+    @apply transform scale-[0.98];
+    box-shadow: 1px 1px 0px rgba(0,0,0,0.8);
+  }
+  .neu-card {
+    @apply bg-white dark:bg-gray-800 rounded-2xl transition-all duration-200;
+    box-shadow: 10px 10px 20px rgba(0,0,0,0.1), -10px -10px 20px rgba(255,255,255,0.8);
+  }
+
+  /* Dark mode retro card styling */
+  .dark .neu-card {
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.8);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .neu-card:hover {
+    box-shadow: 14px 14px 28px rgba(0,0,0,0.15), -14px -14px 28px rgba(255,255,255,0.9);
+    transform: translateY(-2px);
+  }
+
+  /* Dark mode retro card hover */
+  .dark .neu-card:hover {
+    @apply shadow-lg;
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.8);
+    transform: translateY(-2px);
+  }
+  /* Retro styles */
+  .retro-container {
+    @apply relative overflow-hidden;
+  }
+  .retro-scanline {
+    @apply absolute inset-0 pointer-events-none opacity-10 z-10;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+    height: 4px;
+    animation: scanline 4s linear infinite;
+  }
+  .retro-noise {
+    @apply absolute inset-0 pointer-events-none opacity-5 z-10;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+  .retro-glitch {
+    animation: vhs 15s infinite;
+  }
+  .retro-border {
+    @apply border-2 border-gray-300 dark:border-gray-600;
+  }
+  .retro-gradient-bg {
+    @apply bg-gradient-to-r from-retro-purple to-retro-pink dark:from-retro-blue dark:to-retro-teal;
+  }
+  .retro-btn {
+    @apply font-vhs px-4 py-2 transform transition-transform duration-200;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.8);
+  }
+
+  /* Dark mode retro button styling */
+  .dark .retro-btn {
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.8);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .retro-btn:hover {
+    @apply transform translate-y-[-2px];
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.8);
+  }
+  .retro-btn:active {
+    @apply transform translate-y-[2px];
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+  }
+
+  /* Dark mode retro button interactions */
+  .dark .retro-btn:hover {
+    @apply transform translate-y-[-2px];
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.8);
+  }
+  .dark .retro-btn:active {
+    @apply transform translate-y-[2px];
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+  }
+
+  /* Interactive component styles */
+  .retro-btn-enhanced {
+    @apply retro-btn;
+    transition: all 0.2s ease;
+  }
+
+  .retro-btn-enhanced:hover {
+    animation: retroPulse 1s ease-in-out;
+  }
+
+  .like-animation {
+    animation: likeAnimation 0.3s ease-in-out;
+  }
+
+  .comment-pop {
+    animation: commentPop 0.3s ease-out;
+  }
+
+  .micro-bounce:hover {
+    animation: likeAnimation 0.2s ease-in-out;
+  }
+
+  .pulse-glow {
+    animation: retroPulse 2s infinite;
+  }
+
+  /* Loading dots animation for buttons */
+  .loading-dots {
+    display: inline-flex;
+    gap: 2px;
+  }
+
+  .loading-dots span {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: currentColor;
+    animation: loadingDots 1.4s infinite ease-in-out both;
+  }
+
+  .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+  .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+  @keyframes loadingDots {
+    0%, 80%, 100% {
+      transform: scale(0);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  /* Theme transition effect for the whole app */
+  .theme-transition {
+    @apply transition-theme duration-400 ease-in-out;
+  }
+
+  /* Enhanced retro animations */
+  @keyframes retroGlow {
+    0%, 100% { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+    50% { text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor; }
+  }
+
+  @keyframes likeAnimation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes commentPop {
+    0% { transform: translateY(10px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes retroPulse {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(157,78,221,0.5), 0 0 10px rgba(157,78,221,0.3);
+    }
+    50% {
+      box-shadow: 0 0 10px rgba(157,78,221,0.8), 0 0 20px rgba(157,78,221,0.5), 0 0 30px rgba(157,78,221,0.3);
+    }
+  }
+
+  @keyframes dataStream {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+  }
+
+  @keyframes hologramFlicker {
+    0%, 100% { opacity: 1; filter: hue-rotate(0deg); }
+    25% { opacity: 0.8; filter: hue-rotate(90deg); }
+    50% { opacity: 0.9; filter: hue-rotate(180deg); }
+    75% { opacity: 0.7; filter: hue-rotate(270deg); }
+  }
+
+  /* Enhanced button interactions */
+  .retro-btn-enhanced {
+    @apply relative overflow-hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .retro-btn-enhanced::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0;
+    transform: translateX(-100%);
+    transition: all 0.6s;
+  }
+
+  .retro-btn-enhanced:hover::before {
+    @apply opacity-20;
+    transform: translateX(100%);
+  }
+
+  /* Loading skeleton animations */
+  @keyframes shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  .dark .skeleton {
+    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+    background-size: 200px 100%;
+  }
+
+  /* Enhanced micro-interactions */
+  .micro-bounce {
+    transition: transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .micro-bounce:hover {
+    transform: scale(1.05) translateY(-2px);
+  }
+
+  .micro-bounce:active {
+    transform: scale(0.95) translateY(1px);
+  }
+
+  /* Search input styling */
+  .retro-input {
+    position: relative;
+  }
+
+  .retro-input:focus {
+    box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.1);
+  }
+
+  .dark .retro-input:focus {
+    box-shadow: 0 0 0 3px rgba(0, 245, 212, 0.1);
+  }
+
+  /* Search highlight styling */
+  mark {
+    background-color: rgba(255, 184, 0, 0.3);
+    color: #9D4EDD;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+  }
+
+  .dark mark {
+    background-color: rgba(0, 245, 212, 0.3);
+    color: #00F5D4;
+  }
+
+  /* Pulse animation for loading states */
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+      box-shadow: 0 0 0 0 rgba(157, 78, 221, 0.7);
+    }
+    50% {
+      opacity: 0.8;
+      box-shadow: 0 0 0 10px rgba(157, 78, 221, 0);
+    }
+  }
+
+  .pulse-glow {
+    animation: pulse-glow 2s infinite;
+  }
+
+  /* Simple focus styles */
+  .focus-visible {
+    @apply outline-none;
+  }
+
+  /* Neomorphism day mode styling */
+  .light-mode .neu-button {
+    @apply bg-white;
+    box-shadow: 8px 8px 16px rgba(0,0,0,0.1), -8px -8px 16px rgba(255,255,255,0.8);
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .light-mode .neu-button:hover {
+    @apply bg-retro-teal text-black;
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.1), inset -4px -4px 8px rgba(255,255,255,0.8);
+    transform: translateY(-1px);
+    border: 1px solid rgba(0,0,0,0.2);
+  }
+
+  .light-mode .neu-card {
+    @apply bg-retro-cream;
+    box-shadow: 12px 12px 24px rgba(0,0,0,0.1), -12px -12px 24px rgba(255,255,255,0.8);
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .light-mode .neu-card:hover {
+    box-shadow: 16px 16px 32px rgba(0,0,0,0.15), -16px -16px 32px rgba(255,255,255,0.9);
+    transform: translateY(-2px);
+  }
+
+  .light-mode .retro-btn {
+    @apply bg-retro-cream text-black;
+    box-shadow: 6px 6px 12px rgba(0,0,0,0.15), -6px -6px 12px rgba(255,255,255,0.9);
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+
+  .light-mode .retro-btn:hover {
+    @apply bg-retro-teal text-black;
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.1), inset -3px -3px 6px rgba(255,255,255,0.8);
+    transform: translateY(-1px);
+  }
+
+  /* Neomorphism day mode navigation */
+  .light-mode nav {
+    @apply bg-retro-cream;
+    box-shadow: 0 -8px 16px rgba(0,0,0,0.1), 0 8px 16px rgba(255,255,255,0.8);
+  }
+
+  .light-mode header {
+    @apply bg-retro-cream;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1), 0 -8px 16px rgba(255,255,255,0.8);
+  }
+
+  /* Dark mode retro navigation */
+  .dark nav {
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+  }
+
+  .dark header {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+  /* Retro text glow for day mode */
+  .light-mode h1, .light-mode h2, .light-mode h3 {
+    text-shadow: 2px 2px 4px rgba(157,78,221,0.3);
+  }
+
+  .light-mode .retro-heading {
+    animation: retro-glow 3s ease-in-out infinite alternate;
+  }
+
+  /* Enhanced retro scanlines for day mode */
+  .light-mode .retro-scanline {
+    background: linear-gradient(to bottom,
+      rgba(157,78,221,0) 0%,
+      rgba(157,78,221,0.3) 50%,
+      rgba(157,78,221,0) 100%);
+  }
+
+  /* Day mode specific button active states - Neomorphism */
+  .light-mode button[aria-selected="true"] {
+    @apply bg-retro-teal text-black;
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2), inset -4px -4px 8px rgba(255,255,255,0.7);
+  }
+
+  /* Dark mode specific button active states - Retro */
+  .dark button[aria-selected="true"] {
+    @apply bg-retro-blue text-white;
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.8);
+  }
+
+  /* Retro pulse effect for day mode */
+  .light-mode .pulse-glow {
+    animation: pulse-glow-day 2s infinite;
+  }
+
+  @keyframes pulse-glow-day {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(157,78,221,0.5), 0 0 10px rgba(157,78,221,0.3);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(157,78,221,0.8), 0 0 30px rgba(157,78,221,0.5);
+    }
+  }
+
+  /* Enhanced micro-interactions for day mode */
+  .light-mode .micro-bounce:hover {
+    transform: scale(1.05) translateY(-3px);
+    box-shadow: 0 8px 25px rgba(157,78,221,0.3);
+  }
+
+  /* Day mode loading dots */
+  .light-mode .loading-dots span {
+    background: linear-gradient(45deg, #9D4EDD, #FF3E6D);
+  }
+
+  /* Enhanced retro container for day mode */
+  .light-mode .retro-container {
+    background: radial-gradient(circle at 20% 80%, rgba(157,78,221,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,62,109,0.1) 0%, transparent 50%);
+  }
+
+  /* Mobile-specific styles */
+  @media (max-width: 768px) {
+    /* Enhanced touch targets */
+    .min-h-touch {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* Improved tap highlighting - simplified for older browsers */
+    * {
+      -webkit-tap-highlight-color: rgba(157, 78, 221, 0.2);
+      -webkit-touch-callout: none;
+      /* Disable text selection on mobile for better UX */
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    /* Allow text selection for content areas */
+    p, span, div[contenteditable], input, textarea {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+
+    /* Smooth scrolling for mobile - with fallback */
+    html {
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      /* Prevent zoom on input focus */
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* Mobile navigation enhancements */
+    .mobile-nav-item {
+      transition: all 0.2s ease-in-out;
+    }
+
+    .mobile-nav-item:active {
+      transform: scale(0.95);
+      background-color: rgba(157, 78, 221, 0.1);
+    }
+
+    /* Swipe indicator animations */
+    .swipe-hint {
+      animation: swipe-hint 2s ease-in-out infinite;
+    }
+
+    @keyframes swipe-hint {
+      0%, 100% { transform: translateX(0); opacity: 0.7; }
+      50% { transform: translateX(10px); opacity: 1; }
+    }
+
+    /* Pull to refresh styles */
+    .pull-to-refresh {
+      transition: transform 0.3s ease-out;
+    }
+
+    /* Mobile card hover effects */
+    .mobile-card:active {
+      transform: scale(0.98);
+    }
+
+    /* Enhanced mobile typography */
+    .mobile-text-sm { font-size: 14px; line-height: 1.4; }
+    .mobile-text-base { font-size: 16px; line-height: 1.5; }
+    .mobile-text-lg { font-size: 18px; line-height: 1.6; }
+
+    /* Mobile spacing utilities */
+    .mobile-p-2 { padding: 8px; }
+    .mobile-p-4 { padding: 16px; }
+    .mobile-p-6 { padding: 24px; }
+    .mobile-m-2 { margin: 8px; }
+    .mobile-m-4 { margin: 16px; }
+    .mobile-m-6 { margin: 24px; }
+  }
+
+  /* Touch device specific styles */
+  @media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects on touch devices */
+    .hover-only {
+      display: none;
+    }
+
+    /* Enhanced button feedback for touch */
+    button:active, .btn:active {
+      transform: scale(0.95);
+      transition: transform 0.1s ease-in-out;
+    }
+
+    /* Larger touch targets */
+    button, .btn, a, input, select, textarea {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* Improved focus styles for touch navigation */
+    button:focus, .btn:focus, a:focus {
+      outline: none;
+    }
+  }
+
+  /* Dark mode navbar border */
+  .dark nav[data-theme-border="true"] {
+    border-top-color: #00F5D4 !important; /* retro-teal */
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .retro-btn {
+      box-shadow: 6px 6px 0px rgba(0,0,0,1);
+    }
+
+    .neu-card {
+      box-shadow: 6px 6px 0px rgba(0,0,0,1);
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+
+    .retro-scanline,
+    .retro-glitch {
+      animation: none;
+    }
+  }
+
+  /* Image optimization styles */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  /* High-quality image rendering for avatars */
+  .avatar-image {
+    image-rendering: auto;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+  }
+
+  /* Smooth image transitions */
+  .image-fade-in {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .image-fade-in.loaded {
+    opacity: 1;
+  }
+
+  /* Performance optimizations for older mobile browsers */
+  @media (max-width: 768px) {
+    /* Disable heavy animations on mobile for better performance */
+    .retro-scanline,
+    .retro-noise {
+      display: none !important;
+    }
+
+    /* Disable glitch animation but keep element visible */
+    .retro-glitch {
+      animation: none !important;
+    }
+
+    /* Simplify transitions for better performance */
+    * {
+      transition-duration: 0.2s !important;
+    }
+
+    /* Optimize images for mobile */
+    img {
+      image-rendering: auto;
+    }
+
+    /* Disable backdrop-filter on older browsers that don't support it */
+    @supports not (backdrop-filter: blur(10px)) {
+      .neu-card,
+      .mobile-card,
+      [class*="backdrop-blur"] {
+        backdrop-filter: none !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+      }
+
+      .dark .neu-card,
+      .dark .mobile-card,
+      .dark [class*="backdrop-blur"] {
+        background: rgba(0, 0, 0, 0.8) !important;
+      }
+    }
+
+    /* Disable complex gradients on very old browsers */
+    @media (-webkit-min-device-pixel-ratio: 0) and (max-device-width: 480px) {
+      .retro-container {
+        background: #FFFCF2 !important;
+      }
+
+      .dark .retro-container {
+        background: #0B090A !important;
+      }
+    }
+  }
+
+  /* Screen reader only content */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Enhanced loading states */
+  .loading-dots {
+    display: inline-flex;
+    gap: 4px;
+  }
+
+  .loading-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+    animation: loading-bounce 1.4s ease-in-out infinite both;
+  }
+
+  .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+  .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+  @keyframes loading-bounce {
+    0%, 80%, 100% {
+      transform: scale(0);
+    } 40% {
+      transform: scale(1);
+    }
+  }
+
+  /* Edit button positioning and z-index fixes */
+  .edit-button {
+    /* Edit buttons should be above cards but below navbar - no z-index to use natural stacking */
+    /* Improve touch targets on mobile */
+    min-width: 44px;
+    min-height: 44px;
+    /* Prevent interference with card hover effects */
+    pointer-events: auto;
+    /* Ensure proper positioning */
+    position: absolute !important;
+  }
+
+  /* Ensure edit buttons work properly on mobile */
+  @media (max-width: 768px) {
+    .edit-button {
+      /* Larger touch target for mobile */
+      min-width: 48px;
+      min-height: 48px;
+      /* Adjust positioning for mobile */
+      top: 8px !important;
+      right: 8px !important;
+    }
+  }
+
+  /* Ensure edit buttons don't interfere with card interactions */
+  .edit-button:hover {
+    /* No z-index on hover to maintain natural stacking order */
+  }
+
+  /* Ensure proper layering hierarchy for all components */
+  .classmate-card {
+    /* Cards should be above background but below navbar and edit buttons */
+    z-index: auto !important;
+  }
+
+  /* Ensure content doesn't overlap with navbar on all devices */
+  .mobile-content-padding {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px)) !important;
+  }
+
+  /* Responsive adjustments for different screen sizes */
+  @media (min-width: 769px) {
+    .edit-button {
+      /* Desktop positioning */
+      top: 12px !important;
+      right: 12px !important;
+      min-width: 40px;
+      min-height: 40px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .edit-button {
+      /* Small mobile positioning */
+      top: 6px !important;
+      right: 6px !important;
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
+
+
+
+  /* Mobile Navigation Fixes */
+  @supports (padding: max(0px)) {
+    .mobile-navbar-safe {
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+  }
+
+  /* Ensure mobile navbar stays visible during scroll */
+  @media (max-width: 768px) {
+    .mobile-navbar-fixed {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 9999 !important;
+      transform: translateZ(0) !important;
+      -webkit-transform: translateZ(0) !important;
+      will-change: transform !important;
+      -webkit-backface-visibility: hidden !important;
+      backface-visibility: hidden !important;
+      /* Prevent iOS Safari from hiding the navbar */
+      -webkit-transform: translate3d(0, 0, 0) !important;
+      transform: translate3d(0, 0, 0) !important;
+    }
+
+    /* Prevent content from being hidden behind navbar */
+    .mobile-content-padding {
+      padding-bottom: calc(120px + env(safe-area-inset-bottom, 20px)) !important;
+    }
+
+    /* Fix for iOS Safari address bar behavior */
+    @supports (-webkit-touch-callout: none) {
+      .mobile-navbar-fixed {
+        position: -webkit-sticky !important;
+        position: sticky !important;
+        bottom: 0 !important;
+      }
+    }
+  }
+}

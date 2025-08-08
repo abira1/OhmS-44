@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share to OhmS-44</title>
+    <link rel="icon" href="/favicon.ico">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #FFFCF2 0%, #F8F4E6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #9D4EDD, #7B2CBF);
+            border-radius: 15px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        h1 {
+            color: #333;
+            margin: 0;
+            font-size: 24px;
+        }
+        .subtitle {
+            color: #666;
+            margin: 5px 0 0;
+        }
+        .share-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .field {
+            margin-bottom: 15px;
+        }
+        .field label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .field input, .field textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .field textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #9D4EDD;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #7B2CBF;
+        }
+        .btn-secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚡</div>
+            <h1>Share to OhmS-44</h1>
+            <p class="subtitle">Add content to your class management system</p>
+        </div>
+        
+        <form id="shareForm" class="share-content">
+            <div class="field">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" placeholder="Enter title...">
+            </div>
+            
+            <div class="field">
+                <label for="text">Content</label>
+                <textarea id="text" name="text" placeholder="Enter content..."></textarea>
+            </div>
+            
+            <div class="field">
+                <label for="url">URL</label>
+                <input type="url" id="url" name="url" placeholder="https://...">
+            </div>
+            
+            <div class="buttons">
+                <button type="button" class="btn btn-secondary" onclick="closeShare()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Share to OhmS</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Get shared data from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById('title').value = urlParams.get('title') || '';
+        document.getElementById('text').value = urlParams.get('text') || '';
+        document.getElementById('url').value = urlParams.get('url') || '';
+
+        document.getElementById('shareForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const text = document.getElementById('text').value;
+            const url = document.getElementById('url').value;
+            
+            // Store shared content in localStorage for the main app to pick up
+            const sharedData = { title, text, url, timestamp: Date.now() };
+            localStorage.setItem('ohms_shared_content', JSON.stringify(sharedData));
+            
+            // Redirect to main app
+            window.location.href = '/?shared=true';
+        });
+
+        function closeShare() {
+            if (window.opener) {
+                window.close();
+            } else {
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+{
+  "rules": {
+    // Helper function to check if user is admin
+    ".read": "auth != null",
+    ".write": false,
+
+    // Users collection - users can read their own data, admins can read all, only authenticated users can write their own data
+    "users": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid == $uid || auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+
+    // User profiles - users can create and update their own profiles, admins can manage all
+    "userProfiles": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && (auth.uid == $uid || auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')"
+      }
+    },
+
+    // User approval requests - admins can read all, users can read their own
+    "userApprovalRequests": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid == $uid || auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')",
+        ".write": "auth != null && (auth.uid == $uid || auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')",
+        ".indexOn": ["status", "requestedAt", "email"]
+      }
+    },
+
+    // User approval status - only admins can write, users can read their own status
+    "userApprovalStatus": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid == $uid || auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')",
+        ".write": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')"
+      }
+    },
+
+    // Classes collection - AUTHENTICATED READ access for approved users, write access only for admin
+    "classes": {
+      ".read": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com' || root.child('userApprovalStatus').child(auth.uid).child('status').val() == 'approved')",
+      ".write": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')",
+      ".indexOn": ["day", "subject", "teacher"]
+    },
+
+    // Students collection - AUTHENTICATED READ access for approved users, write access only for admin
+    "students": {
+      ".read": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com' || root.child('userApprovalStatus').child(auth.uid).child('status').val() == 'approved')",
+      ".write": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')",
+      ".indexOn": ["name", "roll", "role"]
+    },
+
+    // Attendance collection - AUTHENTICATED READ access for approved users, write access only for admin
+    "attendance": {
+      ".read": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com' || root.child('userApprovalStatus').child(auth.uid).child('status').val() == 'approved')",
+      ".write": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')",
+      ".indexOn": ["date", "subject"]
+    },
+
+    // Notices collection - ALL authenticated users can read notices and interact
+    "notices": {
+      ".read": "auth != null",
+      ".write": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')",
+      ".indexOn": ["date", "priority", "isActive"],
+      "$noticeId": {
+        "interactions": {
+          ".read": "auth != null",
+          "likes": {
+            ".read": "auth != null",
+            "$userId": {
+              ".read": "auth != null",
+              ".write": "auth != null && auth.uid == $userId"
+            }
+          },
+          "comments": {
+            ".read": "auth != null",
+            "$commentId": {
+              ".read": "auth != null",
+              ".write": "auth != null && (auth.uid == newData.child('userId').val() || auth.uid == data.child('userId').val() || auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')"
+            }
+          }
+        },
+        "likeCount": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        },
+        "commentCount": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        }
+      }
+    },
+
+    // Notes collection - AUTHENTICATED READ access for approved users, write access only for admin
+    "notes": {
+      ".read": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com' || root.child('userApprovalStatus').child(auth.uid).child('status').val() == 'approved')",
+      ".write": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')",
+      ".indexOn": ["date", "subject", "priority", "isActive"]
+    },
+
+    // Metadata collection - AUTHENTICATED READ access for approved users, write access only for admin
+    "metadata": {
+      ".read": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com' || root.child('userApprovalStatus').child(auth.uid).child('status').val() == 'approved')",
+      ".write": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')"
+    },
+
+    // Class cancellations collection - AUTHENTICATED READ access for approved users, write access only for admin
+    "classCancellations": {
+      ".read": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com' || root.child('userApprovalStatus').child(auth.uid).child('status').val() == 'approved')",
+      ".write": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')",
+      ".indexOn": ["classId", "date", "isActive"]
+    },
+
+    // Test collection for development - AUTHENTICATED READ access for approved users, write access only for admin
+    "test": {
+      ".read": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com' || root.child('userApprovalStatus').child(auth.uid).child('status').val() == 'approved')",
+      ".write": "auth != null && (auth.token.email == 'ohms1384@gmail.com' || auth.token.email == 'mthalve1@gmail.com' || auth.token.email == 'abirsabirhossain@gmail.com')"
+    }
+  }
+}

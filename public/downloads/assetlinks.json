@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.web.ohms_44.twa",
+        "sha256_cert_fingerprints": ["6A:4F:DB:59:59:0B:99:62:9C:D4:45:58:4C:90:01:66:C7:BB:EA:63:BE:54:96:0E:45:84:F1:33:7E:27:35:5F"]
+      }
+    }]

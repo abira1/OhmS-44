@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/TPzM1p9L/a-modern-logo-design-featuring-the-ohm-s_u15cEDB4RQuRJu4yFAXImw_jJrXaM7BQoKPk5NvWbZp6Q_(1)-modified.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>OhmS 44</title>
+
+    <!-- Fallback for older browsers -->
+    <style>
+      .legacy-fallback {
+        display: none;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .legacy-container {
+        max-width: 400px;
+        margin: 50px auto;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 30px;
+      }
+
+      .legacy-title {
+        font-size: 28px;
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      .legacy-content {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 30px;
+      }
+
+      .legacy-button {
+        background: #9D4EDD;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 10px;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .legacy-button:hover {
+        background: #8B3FCC;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- Fallback content for older browsers -->
+    <div id="legacy-fallback" class="legacy-fallback">
+      <div class="legacy-container">
+        <div class="legacy-title">⚡ OhmS-44</div>
+        <div class="legacy-content">
+          <p><strong>Where Energy Meets Excellence</strong></p>
+          <p>Your browser may not support all modern features. Please try:</p>
+          <ul style="text-align: left; margin: 20px 0;">
+            <li>Updating your browser</li>
+            <li>Using Chrome, Firefox, or Safari</li>
+            <li>Enabling JavaScript</li>
+          </ul>
+        </div>
+        <a href="/mobile-debug.html" class="legacy-button">📱 Mobile Debug</a>
+        <button onclick="location.reload()" class="legacy-button">🔄 Retry</button>
+      </div>
+    </div>
+
+    <!-- Load polyfills for older browsers -->
+    <script src="/polyfills.js"></script>
+
+    <script>
+      // Check for modern browser support
+      function checkBrowserSupport() {
+        try {
+          // Test for ES6 features
+          eval('const test = () => {}; class Test {}; const {a} = {a:1};');
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      // Enhanced browser detection
+      function isOldMobileBrowser() {
+        var ua = navigator.userAgent;
+
+        // Check for very old mobile browsers
+        if (ua.indexOf('Android 2.') !== -1 ||
+            ua.indexOf('Android 3.') !== -1 ||
+            ua.indexOf('Android 4.0') !== -1 ||
+            ua.indexOf('iPhone OS 6_') !== -1 ||
+            ua.indexOf('iPhone OS 7_') !== -1) {
+          return true;
+        }
+
+        // Check for old Chrome/Safari versions
+        var chromeMatch = ua.match(/Chrome\/(\d+)/);
+        if (chromeMatch && parseInt(chromeMatch[1]) < 58) {
+          return true;
+        }
+
+        var safariMatch = ua.match(/Version\/(\d+)/);
+        if (safariMatch && parseInt(safariMatch[1]) < 11) {
+          return true;
+        }
+
+        return false;
+      }
+
+      // Show fallback if browser doesn't support modern features
+      if (!checkBrowserSupport() || isOldMobileBrowser()) {
+        document.getElementById('root').style.display = 'none';
+        document.getElementById('legacy-fallback').style.display = 'block';
+        console.log('Using legacy fallback for older browser');
+      } else {
+        // Track if React has successfully mounted
+        var reactMounted = false;
+        var fallbackShown = false;
+
+        // Listen for React mount signal
+        window.addEventListener('react-mounted', function() {
+          reactMounted = true;
+          console.log('React app mounted successfully');
+
+          // Hide fallback if it was shown
+          var fallback = document.getElementById('legacy-fallback');
+          if (fallback && fallback.style.display === 'block') {
+            fallback.style.display = 'none';
+            console.log('Hiding fallback - React mounted successfully');
+          }
+        });
+
+        // Also listen for any content being added to root
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+              var root = document.getElementById('root');
+              if (root && root.children.length > 0 && !reactMounted) {
+                console.log('React content detected in DOM');
+                reactMounted = true;
+                window.dispatchEvent(new CustomEvent('react-mounted'));
+              }
+            }
+          });
+        });
+
+        var rootElement = document.getElementById('root');
+        if (rootElement) {
+          observer.observe(rootElement, { childList: true, subtree: true });
+        }
+
+        // Set timeout to show fallback if app doesn't load
+        // Increased timeout to account for loading screen + network delays
+        setTimeout(function() {
+          if (!reactMounted && !fallbackShown) {
+            var root = document.getElementById('root');
+            // Check if React hasn't started or mounted
+            var reactStarted = root && root.getAttribute('data-react-started');
+            var hasContent = root && root.innerHTML && root.innerHTML.trim() !== '';
+
+            if (!reactStarted && !hasContent) {
+              console.log('React failed to start within timeout, showing fallback');
+              document.getElementById('legacy-fallback').style.display = 'block';
+              fallbackShown = true;
+            } else if (reactStarted && !reactMounted) {
+              console.log('React started but taking longer to mount, extending timeout...');
+            }
+          }
+        }, 15000); // Increased from 8s to 15s to account for loading screen
+
+        // Additional check for very slow connections
+        setTimeout(function() {
+          if (!reactMounted && !fallbackShown) {
+            console.log('App failed to load within extended timeout, showing fallback');
+            document.getElementById('legacy-fallback').style.display = 'block';
+            fallbackShown = true;
+          }
+        }, 30000); // Final fallback after 30 seconds
+      }
+    </script>
+
+    <script type="module" src="/src/index.tsx"></script>
+
+    <!-- Fallback script for browsers that don't support modules -->
+    <script nomodule>
+      document.getElementById('root').style.display = 'none';
+      document.getElementById('legacy-fallback').style.display = 'block';
+    </script>
+  </body>
+</html>
