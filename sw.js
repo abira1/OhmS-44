@@ -85,16 +85,22 @@ define(['./workbox-ed523f2f'], (function (workbox) { 'use strict';
     "url": "assets/firebase-MPTq0Wbm.js",
     "revision": null
   }, {
-    "url": "assets/index-Cagy2Iq_.css",
+    "url": "assets/index-By-8iWZX.css",
     "revision": null
   }, {
-    "url": "assets/index-Cuw1QPB4.js",
+    "url": "assets/index-DJZY4_-d.js",
     "revision": null
   }, {
-    "url": "assets/ui-C1qid_e0.js",
+    "url": "assets/ui-eg1ujs3k.js",
+    "revision": null
+  }, {
+    "url": "assets/useSmartRefresh-CSY72QDa.js",
     "revision": null
   }, {
     "url": "assets/vendor-EO9uhuCm.js",
+    "revision": null
+  }, {
+    "url": "assets/web-C1sltTZQ.js",
     "revision": null
   }, {
     "url": "downloads/Readme.html",
@@ -119,7 +125,7 @@ define(['./workbox-ed523f2f'], (function (workbox) { 'use strict';
     "revision": "36ecbd84a8cd4ff1aa03b04f9641a439"
   }, {
     "url": "index.html",
-    "revision": "d0dd3629c5e18eae9dbe8bdb0733cff7"
+    "revision": "2e3a316bee046b46b983ac50213e315f"
   }, {
     "url": "offline.html",
     "revision": "fb9490c762a1ced803729ae78b378371"

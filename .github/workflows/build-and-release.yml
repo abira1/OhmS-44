@@ -1,0 +1,232 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build web application
+      run: npm run build
+      
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Accept Android SDK licenses
+      run: yes | sdkmanager --licenses || true
+      
+    - name: Install Android SDK components
+      run: |
+        sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+        
+    - name: Sync Capacitor
+      run: |
+        npm run cap:sync
+        
+    - name: Create local.properties
+      run: |
+        echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+        
+    - name: Make gradlew executable
+      run: chmod +x android/gradlew
+      
+    - name: Build debug APK
+      run: |
+        cd android
+        ./gradlew assembleDebug --no-daemon
+        
+    - name: Build release APK (if tagged)
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        cd android
+        ./gradlew assembleRelease --no-daemon
+        
+    - name: Upload debug APK as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ohms-debug-apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
+        
+    - name: Upload release APK as artifact (if tagged)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/upload-artifact@v4
+      with:
+        name: ohms-release-apk
+        path: android/app/build/outputs/apk/release/app-release.apk
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download release APK
+      uses: actions/download-artifact@v4
+      with:
+        name: ohms-release-apk
+        path: ./
+        
+    - name: Get tag name
+      id: tag
+      run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+    - name: Rename APK
+      run: mv app-release.apk OhmS-${{ steps.tag.outputs.tag }}.apk
+      
+    - name: Generate changelog
+      id: changelog
+      run: |
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        echo "# OhmS-44 ${{ steps.tag.outputs.tag }} - Enhanced Mobile Experience" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "## 🎉 What's New" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "### Enhanced Pull-to-Refresh" >> $GITHUB_OUTPUT
+        echo "- Comprehensive pull-to-refresh functionality with real-time visual feedback" >> $GITHUB_OUTPUT
+        echo "- Haptic feedback integration using Capacitor with web vibration fallback" >> $GITHUB_OUTPUT
+        echo "- Smart refresh logic for different content types (routine, classmates, attendance, etc.)" >> $GITHUB_OUTPUT
+        echo "- Retro-themed animations with progress feedback" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "### Performance Improvements" >> $GITHUB_OUTPUT
+        echo "- Optimized for smooth 60fps animations with throttled updates" >> $GITHUB_OUTPUT
+        echo "- Efficient gesture recognition and conflict resolution" >> $GITHUB_OUTPUT
+        echo "- Reduced memory usage and improved battery life" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "### Device Compatibility" >> $GITHUB_OUTPUT
+        echo "- Enhanced device detection and compatibility" >> $GITHUB_OUTPUT
+        echo "- Automatic fallback mechanisms for non-touch devices" >> $GITHUB_OUTPUT
+        echo "- Improved accessibility with keyboard shortcuts and ARIA labels" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "### Visual Enhancements" >> $GITHUB_OUTPUT
+        echo "- Retro CRT-style visual effects and animations" >> $GITHUB_OUTPUT
+        echo "- Enhanced dark/light theme support" >> $GITHUB_OUTPUT
+        echo "- Improved mobile layout and responsive design" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "## 📱 Installation" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "1. Download the APK file below" >> $GITHUB_OUTPUT
+        echo "2. Enable \"Install from unknown sources\" in Android Settings → Security" >> $GITHUB_OUTPUT
+        echo "3. Open the downloaded APK file" >> $GITHUB_OUTPUT
+        echo "4. Follow installation prompts" >> $GITHUB_OUTPUT
+        echo "5. Grant necessary permissions for full functionality" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "## 📋 Requirements" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "- **Android Version**: 7.0 (API 24) or higher" >> $GITHUB_OUTPUT
+        echo "- **Storage**: ~10 MB free space" >> $GITHUB_OUTPUT
+        echo "- **RAM**: 2 GB recommended" >> $GITHUB_OUTPUT
+        echo "- **Internet**: Required for data synchronization" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "## 🔧 Permissions" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "This app requires the following permissions:" >> $GITHUB_OUTPUT
+        echo "- **Internet access**: For data synchronization" >> $GITHUB_OUTPUT
+        echo "- **Network state**: To detect connectivity" >> $GITHUB_OUTPUT
+        echo "- **Vibration**: For haptic feedback" >> $GITHUB_OUTPUT
+        echo "- **Wake lock**: To prevent sleep during use" >> $GITHUB_OUTPUT
+        echo "- **Install shortcuts**: For home screen shortcuts" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "## 📞 Support" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "If you encounter any issues:" >> $GITHUB_OUTPUT
+        echo "1. Check the [documentation](https://github.com/abira1/OhmS-44/docs)" >> $GITHUB_OUTPUT
+        echo "2. Report bugs on [GitHub Issues](https://github.com/abira1/OhmS-44/issues)" >> $GITHUB_OUTPUT
+        echo "3. Contact the development team" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "---" >> $GITHUB_OUTPUT
+        echo "" >> $GITHUB_OUTPUT
+        echo "**Build Information:**" >> $GITHUB_OUTPUT
+        echo "- **Version**: ${{ steps.tag.outputs.tag }}" >> $GITHUB_OUTPUT
+        echo "- **Build Date**: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_OUTPUT
+        echo "- **Target SDK**: 34 (Android 14)" >> $GITHUB_OUTPUT
+        echo "- **Min SDK**: 24 (Android 7.0)" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.tag.outputs.tag }}
+        name: OhmS-44 ${{ steps.tag.outputs.tag }} - Enhanced Mobile Experience
+        body: ${{ steps.changelog.outputs.changelog }}
+        files: OhmS-${{ steps.tag.outputs.tag }}.apk
+        draft: false
+        prerelease: false
+        # repository: abira1/ohms-releases  # Will create releases in main repo for now
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Job to create debug releases for testing
+  debug-release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download debug APK
+      uses: actions/download-artifact@v4
+      with:
+        name: ohms-debug-apk
+        path: ./
+        
+    - name: Get commit SHA
+      id: commit
+      run: echo "sha=${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
+      
+    - name: Rename debug APK
+      run: mv app-debug.apk OhmS-debug-${{ steps.commit.outputs.sha }}.apk
+      
+    - name: Create debug release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: debug-${{ steps.commit.outputs.sha }}
+        name: OhmS-44 Debug Build (${{ steps.commit.outputs.sha }})
+        body: |
+          # OhmS-44 Debug Build
+          
+          This is an automated debug build from the latest main branch.
+          
+          **⚠️ Debug Build Notice:**
+          - This is a development build for testing purposes
+          - May contain bugs or incomplete features
+          - Not recommended for production use
+          
+          **Commit**: ${{ github.sha }}
+          **Build Date**: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
+          
+          For stable releases, please use the official tagged versions.
+        files: OhmS-debug-${{ steps.commit.outputs.sha }}.apk
+        draft: false
+        prerelease: true
+        # repository: abira1/ohms-releases  # Will create releases in main repo for now
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
